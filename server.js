@@ -8,10 +8,10 @@ var zomato = require('zomato');
 var GoogleMaps = require('@google/maps');
 
 // API Keys 
-const apiKeyWeather = '36b3fffa62b23ee8d99209c7748bcc11';
-const apiKeyGoogle = 'AIzaSyALxnznHKaOFYyKB35bm1JVkhM032X9DOA';
-const apiKeyFlickr = '1af735ac2d4ffda3ec37d68ab100c305';
-const apiKeyZmato = '3fd7e9f90961452a3ffc81ebc6b87513';
+const apiKeyWeather = 'YOUR API KEY';
+const apiKeyGoogle = 'YOUR API KEY';
+const apiKeyFlickr = 'YOUR API KEY';
+const apiKeyZmato = 'YOUR API KEY';
 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
