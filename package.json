@@ -1,0 +1,26 @@
+{
+  "name": "citylife",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google/maps": "^0.5.5",
+    "async": "^2.6.1",
+    "body-parser": "^1.18.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "flickr-sdk": "^3.7.0",
+    "promises": "^0.2.5",
+    "request": "^2.88.0",
+    "zomato": "^1.1.0"
+  },
+  "devDependencies": {
+    "babel-plugin-syntax-async-functions": "^6.13.0"
+  }
+}

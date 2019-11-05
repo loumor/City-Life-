@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--Import JQUERY-->
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <meta charset="utf-8">
+    <!--Page Name-->
+    <title>City Life</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <!--Input/Sort Buttons-->
+    <div class="container">
+      <fieldset>
+        <form action="/" method="post">
+          <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required>
+          <input type="submit" class="ghost-button" value="Get The Perfect Meal">
+          <p id = "selectButtonflick">Sort Area Images By:</p>
+          <select id ="dropdown" name = "flickSort" required>
+            <!--Returned Results-->
+              <option value="none">None</option>
+              <option value="interestingness-asc">Popularity Asc</option>
+              <option value="interestingness-desc">Popularity Desc</option>
+              <option value="relevance">Relevance</option>
+              <option value="date-posted-asc">Date Posted Asc</option>
+              <option value="date-posted-desc">Date Posted Desc</option>
+            </select>
+
+          <p id = "selectButtonweather">Additional Weather Details:</p>
+          <select id ="dropdown2" name = "weatherInfo" required>
+              <!--Returned Results-->
+              <option value="No Additional Info">None</option>
+              <option value="Description">Description</option>
+              <option value="Humidity">Humidity</option>
+              <option value="Wind">Wind</option>
+              <option value="Max & Min Temp">Max & Min Temp</option>
+              <option value="Sunrise & Sunset">Sunrise & Sunset</option>
+            </select>
+        </form>
+        <!--Variables passed from server.js-->
+        <% if(weather !== null){ %>
+          <p><%= weather %></p>
+        <% } %>
+
+        <% if(error !== null){ %>
+          <p><%= error %></p>
+        <% } %>
+      </fieldset>
+    </div>
+    
+    <!--GOOGLE MAPS SECTION-->
+            <!--Variables passed from server.js-->
+          <% if(headlocation !== null){ %>
+            <h3><%= headlocation %></h3>
+          <% } %>
+  
+          <% if(error !== null){ %>
+            <h3><%= error %></h3>
+          <% } %>
+
+          <div id="map">
+          <% var getLat = lat %>
+          <% var getlong = long %> 
+         <script>
+            // Initialize and add the map
+            var marker, map; // Create gloabl variables 
+            function initMap() {
+             // The location of city passed from server.js
+              var passLat = <%= getLat  %>;
+              var passLong = <%= getlong  %>;
+           
+              var city = {lat: passLat, lng: passLong}; 
+              // The map, centered at city location
+              map = new google.maps.Map(
+              document.getElementById('map'), {zoom: 10, center: city});
+              // The marker, positioned at users city location
+              marker = new google.maps.Marker({position: city, map: map});
+              
+              map.addListener('center_changed', function() {
+              
+              window.setTimeout(function() {
+                  map.panTo(marker.getPosition());
+                }, 3000);
+              });
+              // Add a marker on the location
+              marker.addListener('click', function() {
+                map.setZoom(16);
+                map.setCenter(marker.getPosition());
+              });
+            
+             }
+         </script>
+          <!--Call Google maps, this then calls the map function above-->
+          <script 
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyALxnznHKaOFYyKB35bm1JVkhM032X9DOA&callback=initMap" defer>
+          </script>
+      </div>
+      
+      <!--FLICKR SECTION-->
+      <h3 id = "LocalPhotos"> What the Local Area Looks Like:</h3>
+      <div id = "flick">
+          <script>
+              // Grab the <img> src's from server.js in a single string 
+              var passArrayF = "<%= imgLinksFl  %>";  
+              var passArrayFlick = [];
+              passArrayFlick = passArrayF.split(','); // Split the string into an array
+              let imagesFlick = $("#flick");
+                // Attach all images to the webpage 
+                for (i=0; i < passArrayFlick.length; i++){
+                  imagesFlick.append(
+                    $("<img>")
+                      .attr("src", passArrayFlick[i])
+                  )  
+                } 
+              </script>
+      </div>
+
+      <!--ZOMATO SECTION -->
+      <h3 id = "PickARest">Select A Restaurant From The Following:</h3>
+      <div id = "zomato">
+          <script> 
+              // Get all the variables in a string form then 
+              // pass them to an array by splitting 
+              var passStringI = "<%= imgLinks  %>";  
+              var passStringW = "<%= WebLinks  %>";
+              var passStringLat = "<%= restLat %>";
+              var passStringLong = "<%= restLong %>";
+              var passRestName = "<%= restname %>";
+              var passArrayI = [];
+              var passArrayW = []
+              var passArrayLat = [];
+              var passArrayLong = [];
+              var restName =[];
+              restName = passRestName.split(',');
+              passArrayI = passStringI.split(',');
+              passArrayW = passStringW.split(',');
+              passArrayLat = passStringLat.split(',');
+              passArrayLong = passStringLong.split(',');
+              // Set initial marker position 
+              var restMarker = {
+                  lat: 0,
+                  lng: 0
+                };
+              let imagesZom = $("#zomato");      
+              var prev_infowindow = false; // Turn off info window
+              
+                for (let i=0; i < passArrayI.length; i++){
+                  imagesZom.append(
+                    $("<a>") // Attach the website link around the images 
+                      .attr("href", passArrayW[i])
+                      .attr("target", "_blank")
+                      .append("<img id = img"+i+ " " + "src =" + passArrayI[i] + "</img>") // Add the images of each restaurant
+                      .click(function(){
+
+                          // Move the marker to the restaurant position when the image is clicked
+                          restMarker = { 
+                            lat: parseFloat(passArrayLat[i]),
+                            lng: parseFloat(passArrayLong[i])
+                              };
+                              setTimeout(function(){
+                                marker.setPosition(restMarker);
+                                map.setCenter(marker.getPosition());
+                                }, 100)
+
+                                // Create a new info window above the marker and display 
+                                // the name of the restaurant once the image is clicked 
+                                var contentInfo = '<div>' + restName[i] + '</div>'
+                                var infowindow = new google.maps.InfoWindow({
+                                    content: contentInfo
+                                });
+
+                                // Close the previous info window if there was one open 
+                                // if not open the new info window 
+                                 if( prev_infowindow ) {
+                                   prev_infowindow.close();
+                                 }
+                                prev_infowindow = infowindow;
+                                infowindow.open(map,marker);
+                            })
+                          )
+                  }
+              </script> 
+      </div>
+  </body>
+</html>
